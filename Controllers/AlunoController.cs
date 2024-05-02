@@ -13,73 +13,106 @@ namespace AlunosApi.Controllers
     [Route("api/[controller]")]
     public class AlunoController : ControllerBase
     {
-        private readonly Context _context;
-        public AlunoController(Context context)
+        private readonly IRepository _repository;
+        public AlunoController(IRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Ok(_context.Alunos);
+            var result = _repository.GetAllAlunos(true);
+            return Ok(result);
         }
 
         [HttpGet("{id:int}")] //pode ser usado com  [HttpGet("{ById/{id}")] 
-        public IActionResult GetById (int id)
+        public IActionResult GetById(int id)
         {
-            var aluno = _context.Alunos.FirstOrDefault(a => a.Id == id);
-            if (aluno == null) return BadRequest("Aluno não encotrado");
+            //var aluno = _context.Alunos.FirstOrDefault(a => a.Id == id);
+            var aluno = _repository.GetAlunoId(id, false);
+            if (aluno == null) return BadRequest("Aluno nï¿½o encotrado");
             return Ok(aluno);
         }
 
-        [HttpGet("ByName")]
-        public IActionResult GetByName (string nome, string sobrenome)
-        {
-            var nomeAluno = _context.Alunos.FirstOrDefault(a => a.Nome.Contains(nome) && a.Sobrenome.Contains(sobrenome));
-            if (nomeAluno == null) return BadRequest("Aluno não encontrado");
-            return Ok(nomeAluno);
-        }
+        // [HttpGet("ByName")]
+        // public IActionResult GetByName (string nome, string sobrenome)
+        // {
+        //     var nomeAluno = _context.Alunos.FirstOrDefault(a => a.Nome.Contains(nome) && a.Sobrenome.Contains(sobrenome));
+        //     if (nomeAluno == null) return BadRequest("Aluno nï¿½o encontrado");
+        //     return Ok(nomeAluno);
+        // }
 
         [HttpPost("{id}")]
         public IActionResult Post(Aluno aluno)
         {
-            _context.Add(aluno);
-            _context.SaveChanges();
-            return Ok(aluno);
+            _repository.Add(aluno);
+            if (_repository.SaveChanges())
+            {
+                return Ok(aluno);
+            }
+            return BadRequest("Aluno nÃ£o cadastrado");
+
+            // _context.Add(aluno);
+            // _context.SaveChanges();
+            // return Ok(aluno);
         }
 
         [HttpPut("{id}")]
         public IActionResult Put(int id, Aluno aluno)
         {
-            var alunos = _context.Alunos.AsNoTracking().FirstOrDefault(a => a.Id == id);
-            if (alunos == null) return BadRequest("aluno não encotrado");
+            //var alunos = _context.Alunos.AsNoTracking().FirstOrDefault(a => a.Id == id);
+            var alunos = _repository.GetAlunoId(id);
+            if (alunos == null) return BadRequest("aluno nï¿½o encotrado");
 
-            _context.Update(aluno);
-            _context.SaveChanges();
-            return Ok(aluno);
+            _repository.Update(aluno);
+            if (_repository.SaveChanges())
+            {
+                return Ok(aluno);
+            }
+            return BadRequest("Aluno nÃ£o Atualizado");
+
+            // _context.Update(aluno);
+            // _context.SaveChanges();
+            // return Ok(aluno);
         }
 
         [HttpPatch("{id}")]
         public IActionResult Patch(int id, Aluno aluno)
         {
-            var alunos = _context.Alunos.AsNoTracking().FirstOrDefault(a => a.Id == id);
-            if (alunos == null) return BadRequest("aluno não encotrado");
+            // var alunos = _context.Alunos.AsNoTracking().FirstOrDefault(a => a.Id == id);
+            var alunos = _repository.GetAlunoId(id);
+            if (alunos == null) return BadRequest("aluno nï¿½o encotrado");
 
-            _context.Update(aluno);
-            _context.SaveChanges();
-            return Ok(aluno);
+            _repository.Update(aluno);
+            if (_repository.SaveChanges())
+            {
+                return Ok(aluno);
+            }
+            return BadRequest("Aluno nÃ£o Atualizado");
+
+            // _context.Update(aluno);
+            // _context.SaveChanges();
+            // return Ok(aluno);
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var aluno = _context.Alunos.FirstOrDefault(a => a.Id == id);
-            if (aluno == null) return BadRequest("aluno não encotrado");
+            // var aluno = _context.Alunos.FirstOrDefault(a => a.Id == id);
+            var aluno = _repository.GetAlunoId(id);
+            if (aluno == null) return BadRequest("aluno nï¿½o encotrado");
 
-            _context.Remove(aluno);
-            _context.SaveChanges();
-            return Ok();
+            _repository.Delete(aluno);
+            if (_repository.SaveChanges())
+            {
+                return Ok("Aluno Deletado");
+            }
+            return BadRequest("Aluno nÃ£o Deletado");
+
+            // _context.Remove(aluno);
+            // _context.SaveChanges();
+            // return Ok();
         }
     }
 }

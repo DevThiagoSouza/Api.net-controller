@@ -13,73 +13,103 @@ namespace AlunosApi.Controllers
     [Route("api/[controller]")]
     public class ProfessorController : ControllerBase
     {
-        private readonly Context _context;
-        public ProfessorController(Context context)
+        private readonly IRepository _repository;
+        public ProfessorController(IRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Ok(_context.Professors);
+            var result = _repository.GetAllProfessores(true);
+            return Ok(result);
         }
 
         [HttpGet("{id:int}")] //pode ser usado com  [HttpGet("{ById/{id}")] 
         public IActionResult GetById(int id)
         {
-            var professor = _context.Alunos.FirstOrDefault(a => a.Id == id);
-            if (professor == null) return BadRequest("Aluno não encotrado");
+            //var professor = _context.Alunos.FirstOrDefault(a => a.Id == id);
+            var professor = _repository.GetProfessorId(id, false);
+            if (professor == null) return BadRequest("Aluno nï¿½o encotrado");
             return Ok(professor);
         }
 
-        [HttpGet("ByName")]
-        public IActionResult GetByName(string nome, string sobrenome)
-        {
-            var nomeProfessor = _context.Alunos.FirstOrDefault(a => a.Nome.Contains(nome) && a.Sobrenome.Contains(sobrenome));
-            if (nomeProfessor == null) return BadRequest("Aluno não encontrado");
-            return Ok(nomeProfessor);
-        }
+        // [HttpGet("ByName")]
+        // public IActionResult GetByName(string nome, string sobrenome)
+        // {
+        //     var nomeProfessor = _context.Alunos.FirstOrDefault(a => a.Nome.Contains(nome) && a.Sobrenome.Contains(sobrenome));
+        //     if (nomeProfessor == null) return BadRequest("Aluno nï¿½o encontrado");
+        //     return Ok(nomeProfessor);
+        // }
 
         [HttpPost("{id}")]
         public IActionResult Post(Professor professor)
         {
-            _context.Add(professor);
-            _context.SaveChanges();
-            return Ok(professor);
+            _repository.Add(professor);
+            if (_repository.SaveChanges())
+            {
+                return Ok(professor);
+            }
+            return BadRequest("Professor nÃ£o encontrado");
+
+
+            // _context.Add(professor);
+            // _context.SaveChanges();
+            // return Ok(professor);
         }
 
         [HttpPut("{id}")]
         public IActionResult Put(int id, Professor professor)
         {
-            var professores = _context.Alunos.AsNoTracking().FirstOrDefault(a => a.Id == id);
-            if (professor == null) return BadRequest("Professor não encotrado");
+            //var professores = _context.Alunos.AsNoTracking().FirstOrDefault(a => a.Id == id);
+            var professores = _repository.GetProfessorId(id);
+            if (professores == null) return BadRequest("Professor nï¿½o encotrado");
 
-            _context.Update(professor);
-            _context.SaveChanges();
-            return Ok(professor);
+            _repository.Update(professor);
+            if (_repository.SaveChanges())
+            {
+                return Ok(professor);
+            }
+            return BadRequest("Professor nÃ£o encotrado");
+
         }
 
         [HttpPatch("{id}")]
         public IActionResult Patch(int id, Professor professor)
         {
-            var rofessores = _context.Alunos.AsNoTracking().FirstOrDefault(a => a.Id == id);
-            if (rofessores == null) return BadRequest("Professor não encotrado");
+            // var rofessores = _context.Alunos.AsNoTracking().FirstOrDefault(a => a.Id == id);
+            var professores = _repository.GetProfessorId(id);
+            if (professores == null) return BadRequest("Professor nï¿½o encotrado");
 
-            _context.Update(professor);
-            _context.SaveChanges();
-            return Ok(professor);
+
+            _repository.Update(professor);
+            if (_repository.SaveChanges())
+            {
+                return Ok(professor);
+            }
+            return BadRequest("Professor nÃ£o encotrado");
+            // _context.Update(professor);
+            // _context.SaveChanges();
+            // return Ok(professor);
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var professor = _context.Alunos.FirstOrDefault(a => a.Id == id);
-            if (professor == null) return BadRequest("Professor não encotrado");
+            //var professor = _context.Alunos.FirstOrDefault(a => a.Id == id);
+            var professor = _repository.GetProfessorId(id);
+            if (professor == null) return BadRequest("Professor nï¿½o encotrado");
 
-            _context.Remove(professor);
-            _context.SaveChanges();
-            return Ok();
+            _repository.Delete(professor);
+            if (_repository.SaveChanges())
+            {
+                return Ok(professor);
+            }
+            return BadRequest("Professor nÃ£o encotrado");
+            // _context.Remove(professor);
+            // _context.SaveChanges();
+            // return Ok();
         }
     }
 }

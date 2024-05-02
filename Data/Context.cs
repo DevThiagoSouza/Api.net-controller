@@ -13,7 +13,7 @@ namespace AlunosApi.Data
 
 
         public DbSet<Aluno> Alunos { get; set; }
-        public DbSet<Professor> Professors { get; set; }
+        public DbSet<Professor> Professores { get; set; }
         public DbSet<Diciplina> Diciplinas { get; set; }
         public DbSet<AlunoDiciplina> AlunoDiciplinas { get; set; } 
 
